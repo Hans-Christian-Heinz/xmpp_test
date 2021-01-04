@@ -5,7 +5,8 @@
                         'Elixir.XmppTestParser.Application',
                         'Elixir.XmppTestParser.Structs.IQ',
                         'Elixir.XmppTestParser.Structs.Message',
-                        'Elixir.XmppTestParser.Structs.Presence']},
+                        'Elixir.XmppTestParser.Structs.Presence',
+                        'Elixir.XmppTestParser.Structs.Stream']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.XmppTestParser.Application',[]}}]}.
