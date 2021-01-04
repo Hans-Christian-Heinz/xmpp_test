@@ -1,0 +1,11 @@
+{application,xmpp_test_parser,
+             [{applications,[kernel,stdlib,elixir,logger]},
+              {description,"xmpp_test_parser"},
+              {modules,['Elixir.XmppTestParser',
+                        'Elixir.XmppTestParser.Application',
+                        'Elixir.XmppTestParser.Structs.IQ',
+                        'Elixir.XmppTestParser.Structs.Message',
+                        'Elixir.XmppTestParser.Structs.Presence']},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.XmppTestParser.Application',[]}}]}.
