@@ -11,21 +11,27 @@ defmodule XmppTestParser do
 
   @moduledoc """
   Documentation for `XmppTestParser`.
+
   Module contains functions that receive binaries and return Xmpp-structs (see. stanzas)
+
   Module contains functions that receive Xmpp-structs and return corresponding xml-strings
+
+  Available functions:
+  + parse/1
+  + to_xml/1
+  + to_xml!/1
   """
 
   @doc ~S"""
   Parse the 'string_to_parse' and return a corresponding struct (message, iq, presence)
-  TODO tuple {:ok, res}
 
   ## Examples
 
     iex> XmppTestParser.parse(~s|<presence from="from" to="to" type="type" id="id"><status>status</status><show>show</show></presence>|)
-    %Presence{from: 'from', to: 'to', id: 'id', type: 'type', show: 'show', status: 'status'}
+    {:ok, %Presence{from: 'from', to: 'to', id: 'id', type: 'type', show: 'show', status: 'status'}}
 
     iex> XmppTestParser.parse(~s|<message from="from" to="to" type="type" id="id"><body>body</body></message>|)
-    %Message{from: 'from', to: 'to', id: 'id', type: 'type', body: 'body'}
+    {:ok, %Message{from: 'from', to: 'to', id: 'id', type: 'type', body: 'body'}}
 
     iex> XmppTestParser.parse("random text")
     {:error, :invalid_message}
@@ -33,8 +39,8 @@ defmodule XmppTestParser do
   """
   def parse(string_to_parse) do
     case string_to_parse do
-      "<stream:stream>" -> %Stream{start: true}
-      "</stream:stream>" -> %Stream{stop: true}
+      "<stream:stream>" -> {:ok, %Stream{start: true}}
+      "</stream:stream>" -> {:ok, %Stream{stop: true}}
       <<"<presence", _rest ::bitstring>> -> parse_presence(string_to_parse)
       <<"<message", _rest ::bitstring>> -> parse_message(string_to_parse)
       <<"<iq", _rest ::bitstring>> -> parse_iq(string_to_parse)
@@ -56,6 +62,16 @@ defmodule XmppTestParser do
     ...> show: 'show'
     ...> })
     {:ok, "<presence from=\"from\" to=\"to\" type=\"type\" id=\"id\"><show>show</show><status>status</status></presence>"}
+
+    iex> XmppTestParser.to_xml!(%Message{
+    ...> from: "from",
+    ...> to: "to",
+    ...> body: "body"
+    ...> })
+    "<message from=\"from\" to=\"to\"><body>body</body></message>"
+
+    iex> XmppTestParser.to_xml("some value")
+    {:error, :invalid_stanza}
 
   """
   def to_xml(%Presence{} = presence) do
@@ -113,7 +129,7 @@ defmodule XmppTestParser do
   end
 
   def to_xml(_) do
-    :error
+    {:error, :invalid_stanza}
   end
 
   def to_xml!(val) do
@@ -127,14 +143,14 @@ defmodule XmppTestParser do
     # try ... rescue should normally not be used; it is used, because SweetXml relies on
     # the Erlang-module :xmerl
     try do
-      %Presence{
+      {:ok, %Presence{
         from: xpath(string_to_parse, ~x"//presence/@from"),
         to: xpath(string_to_parse, ~x"//presence/@to"),
         type: xpath(string_to_parse, ~x"//presence/@type"),
         id: xpath(string_to_parse, ~x"//presence/@id"),
         show: xpath(string_to_parse, ~x"//presence/show/text()"),
         status: xpath(string_to_parse, ~x"//presence/status/text()")
-      }
+      }}
     catch
       :exit, {:fatal, e} -> {:error, e}
       :exit, e -> {:error, e}
@@ -147,13 +163,13 @@ defmodule XmppTestParser do
     # try ... rescue should normally not be used; it is used, because SweetXml relies on
     # the Erlang-module :xmerl
     try do
-      %Message{
+      {:ok, %Message{
         from: xpath(string_to_parse, ~x"//message/@from"),
         to: xpath(string_to_parse, ~x"//message/@to"),
         type: xpath(string_to_parse, ~x"//message/@type"),
         id: xpath(string_to_parse, ~x"//message/@id"),
         body: xpath(string_to_parse, ~x"//message/body/text()")
-      }
+      }}
     catch
       :exit, {:fatal, e} -> {:error, e}
       :exit, e -> {:error, e}
@@ -166,7 +182,7 @@ defmodule XmppTestParser do
     # try ... rescue should normally not be used; it is used, because SweetXml relies on
     # the Erlang-module :xmerl
     try do
-      %IQ{
+      {:ok, %IQ{
         from: xpath(string_to_parse, ~x"//iq/@from"),
         to: xpath(string_to_parse, ~x"//iq/@to"),
         type: xpath(string_to_parse, ~x"//iq/@type"),
@@ -186,7 +202,7 @@ defmodule XmppTestParser do
             end
           end
         }
-      }
+      }}
     catch
       :exit, {:fatal, e} -> {:error, e}
       :exit, e -> {:error, e}

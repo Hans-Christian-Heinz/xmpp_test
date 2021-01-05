@@ -13,8 +13,8 @@ defmodule XmppTestParserTest do
 
   test "parses strings" do
     assert {:error, :invalid_message} = XmppTestParser.parse("some text")
-    assert %Stream{start: true, stop: false} == XmppTestParser.parse("<stream:stream>")
-    assert %Stream{start: false, stop: true} == XmppTestParser.parse("</stream:stream>")
+    assert {:ok, %Stream{start: true, stop: false}} == XmppTestParser.parse("<stream:stream>")
+    assert {:ok, %Stream{start: false, stop: true}} == XmppTestParser.parse("</stream:stream>")
   end
 
   test "parses presence-stanzas" do
@@ -23,28 +23,28 @@ defmodule XmppTestParserTest do
                 <show>show</show>
                 <status>status</status>
               </presence>|
-    assert %Presence{
+    assert {:ok, %Presence{
       type: 'type',
       from: 'from',
       to: 'to',
       id: 'id',
       status: 'status',
       show: 'show'
-    } == XmppTestParser.parse(xml)
+    }} == XmppTestParser.parse(xml)
 
     # unknown attributes and nodes are ignored
     xml = ~s|<presence type="type" from123="from" to="to" id="id">
                 <show123>show</show123>
                 <status>status</status>
               </presence>|
-    assert %Presence{
+    assert {:ok, %Presence{
       type: 'type',
       from: nil,
       to: 'to',
       id: 'id',
       status: 'status',
       show: nil
-    } == XmppTestParser.parse(xml)
+    }} == XmppTestParser.parse(xml)
   end
 
   test "message-stanzas" do
@@ -52,13 +52,13 @@ defmodule XmppTestParserTest do
     xml = ~s|<message type="type" from="from" to="to" id="id">
                 <body>body</body>
               </message>|
-    assert %Message{
+    assert {:ok, %Message{
       type: 'type',
       from: 'from',
       to: 'to',
       id: 'id',
       body: 'body'
-    } == XmppTestParser.parse(xml)
+    }} == XmppTestParser.parse(xml)
   end
 
   test "iq-stanzas" do
@@ -69,7 +69,7 @@ defmodule XmppTestParserTest do
                   <item jid="jid2" name="name2"/>
                 </query>
               </iq>|
-    assert %IQ{
+    assert {:ok, %IQ{
       type: 'type',
       from: 'from',
       to: 'to',
@@ -81,7 +81,7 @@ defmodule XmppTestParserTest do
           %Item{jid: "jid2", name: "name2"}
         ]
       }
-    } == XmppTestParser.parse(xml)
+    }} == XmppTestParser.parse(xml)
 
     # one item
     xml = ~s|<iq type="type" from="from" to="to" id="id">
@@ -89,7 +89,7 @@ defmodule XmppTestParserTest do
                   <item jid="jid1" name="name1"/>
                 </query>
               </iq>|
-    assert %IQ{
+    assert {:ok, %IQ{
       type: 'type',
       from: 'from',
       to: 'to',
@@ -100,14 +100,14 @@ defmodule XmppTestParserTest do
         ],
         xmlns: :namespace,
       }
-    } == XmppTestParser.parse(xml)
+    }} == XmppTestParser.parse(xml)
 
     # no items
     xml = ~s|<iq type="type" from="from" to="to" id="id">
                 <query xmlns="namespace">
                 </query>
               </iq>|
-    assert %IQ{
+    assert {:ok, %IQ{
       type: 'type',
       from: 'from',
       to: 'to',
@@ -116,7 +116,7 @@ defmodule XmppTestParserTest do
         xmlns: :namespace,
         items: []
       }
-    } == XmppTestParser.parse(xml)
+    }} == XmppTestParser.parse(xml)
   end
 
   test "invalid xml" do
