@@ -1,8 +1,11 @@
 {application,xmpp_test_server,
-             [{applications,[kernel,stdlib,elixir,logger,xmpp_test_parser]},
+             [{applications,[kernel,stdlib,elixir,logger,myxql,
+                             xmpp_test_parser]},
               {description,"xmpp_test_server"},
               {modules,['Elixir.XmppTestServer',
-                        'Elixir.XmppTestServer.Application']},
+                        'Elixir.XmppTestServer.Application',
+                        'Elixir.XmppTestServer.Users']},
               {registered,[]},
               {vsn,"0.1.0"},
+              {env,[]},
               {mod,{'Elixir.XmppTestServer.Application',[]}}]}.

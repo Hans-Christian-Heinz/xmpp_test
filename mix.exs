@@ -19,6 +19,11 @@ defmodule XmppTest.MixProject do
     [
       # Cowboy ist ein Erlang HTTP-Server, ich versuche XMPP
       # {:plug_cowboy, "~> 2.4"}
+      # {:sqlite, "~> 1.1"},
+      # {:sqlite_ecto2, "~> 2.4"}
+      {:myxql, "~> 0.4.0"},
+      # {:mariaex, "~> 0.9.1"}
+      # {:bcrypt_elixir, "~> 2.3.0"}
     ]
   end
 end

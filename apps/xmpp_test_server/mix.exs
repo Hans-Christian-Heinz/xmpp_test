@@ -18,7 +18,13 @@ defmodule XmppTestServer.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :myxql],
+      env: [
+        # MYSQL_HOST: "192.168.178.79",
+        # MYSQL_DB: "xmpp_test",
+        # MYSQL_USER: "xmpp",
+        # MYSQL_PWD: "Test1234"
+      ],
       mod: {XmppTestServer.Application, []}
     ]
   end

@@ -1,6 +1,6 @@
 defmodule XmppTestParserTest do
 
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias XmppTestParser.Structs.Stream, as: Stream
   alias XmppTestParser.Structs.Presence, as: Presence

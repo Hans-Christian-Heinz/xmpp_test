@@ -16,3 +16,7 @@ import Config
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 #
+
+# TODO: dynamic config: release
+
+import_config "#{config_env()}.exs"
