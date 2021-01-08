@@ -54,4 +54,12 @@ defmodule XmppTestServer.UsersTest do
     assert :ok == Users.logout(users, "mustermann")
     assert {:error, :not_logged_in} == Users.logout(users, "mustermann")
   end
+
+  test "is_registered", %{users: users} do
+    assert false == Users.is_registered?(users, "mustermann")
+    Users.register(users, "mustermann", "Test1234")
+    assert true == Users.is_registered?(users, "mustermann")
+    Users.delete(users, "mustermann", "Test1234")
+    assert false == Users.is_registered?(users, "mustermann")
+  end
 end

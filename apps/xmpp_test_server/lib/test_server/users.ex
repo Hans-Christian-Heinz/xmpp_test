@@ -7,6 +7,8 @@ defmodule XmppTestServer.Users do
   + register/3
   + delete/3
   + login/3
+  + logout/2
+  + is_registered?/2
   """
 
   use GenServer
@@ -47,6 +49,13 @@ defmodule XmppTestServer.Users do
   """
   def logout(pid, username) do
     GenServer.call(pid, {:logout, username: username})
+  end
+
+  @doc """
+  Check if a user with username 'username' is registered in the database.
+  """
+  def is_registered?(pid, username) do
+    GenServer.call(pid, {:is_registered?, username: username})
   end
 
   # Callbacks
@@ -107,6 +116,15 @@ defmodule XmppTestServer.Users do
       {:reply, :ok, state}
     else
       {:reply, {:error, :not_logged_in}, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:is_registered?, username: username}, _from, state) do
+    query = "SELECT id FROM users WHERE username='#{username}';"
+    case MyXQL.query(:myxql, query) do
+      {:ok, res} -> {:reply, res.rows != [], state}
+      {:error, e} -> {:reply, {:error, e}, state}
     end
   end
 

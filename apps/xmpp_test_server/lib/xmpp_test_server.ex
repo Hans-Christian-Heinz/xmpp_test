@@ -27,7 +27,11 @@ defmodule XmppTestServer do
     {:ok, client} = :gen_tcp.accept(socket)
     # pass a connection to a new supervised task
     # Task: process meant to execute one action many times
-    {:ok, pid} = Task.Supervisor.start_child(XmppTestServer.TaskSupervisor, fn -> serve(client) end)
+    # {:ok, pid} = Task.Supervisor.start_child(XmppTestServer.TaskSupervisor, fn -> serve(client) end)
+
+    # problem: need to pass the client
+    {:ok, pid} = DynamicSupervisor.start_child(Users.Supervisor, {XmppTestServer.UserConnection, client})
+    XmppTestServer.UserConnection.serve(pid)
     # assign a new controlling process pid to client
     :ok = :gen_tcp.controlling_process(client, pid)
     loop_acceptor(socket)
