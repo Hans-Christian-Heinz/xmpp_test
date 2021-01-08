@@ -19,7 +19,7 @@ defmodule XmppTestServer.UserConnection do
   Print a message to the client depending on the state of the UserConnection.
   """
   def serve(pid) do
-    GenServer.call(pid, {:serve})
+    GenServer.call(pid, {:serve}, :infinity)
   end
 
   # Server-API
