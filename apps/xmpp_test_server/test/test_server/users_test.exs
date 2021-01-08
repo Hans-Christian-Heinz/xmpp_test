@@ -16,7 +16,7 @@ defmodule XmppTestServer.UsersTest do
     })
     # the table is created newly for every test
     {:ok, _} = MyXQL.query(myxql, "DROP TABLE IF EXISTS users;")
-    {:ok, users} = start_supervised({Users, name: context.test})
+    {:ok, _} = start_supervised({Users, name: context.test})
 
     %{myxql: myxql, users: context.test}
   end
@@ -42,7 +42,16 @@ defmodule XmppTestServer.UsersTest do
   test "login users", %{users: users} do
     assert {:error, :invalid_username} == Users.login(users, "mustermann", "Test1234")
     Users.register(users, "mustermann", "Test1234")
-    assert {:error, :invalid_pwd} == Users.delete(users, "mustermann", "Test12345")
+    assert {:error, :invalid_pwd} == Users.login(users, "mustermann", "Test12345")
     assert :ok = Users.login(users, "mustermann", "Test1234")
+    assert {:error, {:already_registered, _}} = Users.login(users, "mustermann", "Test1234")
+  end
+
+  test "logout users", %{users: users} do
+    assert {:error, :not_logged_in} == Users.logout(users, "mustermann")
+    Users.register(users, "mustermann", "Test1234")
+    Users.login(users, "mustermann", "Test1234")
+    assert :ok == Users.logout(users, "mustermann")
+    assert {:error, :not_logged_in} == Users.logout(users, "mustermann")
   end
 end

@@ -42,6 +42,13 @@ defmodule XmppTestServer.Users do
     GenServer.call(pid, {:login, username: username, pwd: pwd})
   end
 
+  @doc """
+  Logout the given user with username 'username'.
+  """
+  def logout(pid, username) do
+    GenServer.call(pid, {:logout, username: username})
+  end
+
   # Callbacks
 
   @impl true
@@ -75,8 +82,6 @@ defmodule XmppTestServer.Users do
           {:ok, _} -> {:reply, :ok, state}
           {:error, %MyXQL.Error{} = e} -> {:reply, {:error, e.message}, state}
         end
-      false ->
-        {:reply, {:error, :invalid_pwd}, state}
       {:error, e} ->
         {:reply, {:error, e}, state}
     end
@@ -85,10 +90,28 @@ defmodule XmppTestServer.Users do
   @impl true
   def handle_call({:login, username: username, pwd: pwd}, _from, state) do
     case check_pwd(username, pwd) do
-      true -> {:reply, :ok, state}
-      false -> {:reply, {:error, :invalid_pwd}, state}
-      {:error, e} -> {:reply, {:error, e}, state}
+      true ->
+        case Registry.register(Users.Registry, username, nil) do
+          {:ok, _} -> {:reply, :ok, state}
+          {:error, e} -> {:reply, {:error, e}, state}
+        end
+      {:error, e} ->
+        {:reply, {:error, e}, state}
     end
+  end
+
+  @impl true
+  def handle_call({:logout, username: username}, _from, state) do
+    if (logged_in?(username)) do
+      :ok = Registry.unregister(Users.Registry, username)
+      {:reply, :ok, state}
+    else
+      {:reply, {:error, :not_logged_in}, state}
+    end
+  end
+
+  defp logged_in?(username) do
+    Registry.lookup(Users.Registry, username) != []
   end
 
   defp check_pwd(username, pwd) do
@@ -96,8 +119,14 @@ defmodule XmppTestServer.Users do
     {:ok, res} = MyXQL.query(:myxql, query)
     # valid result: exactly one value (one row and one column)
     case res.rows do
-      [[val]] -> val == hash_pwd(pwd)
-      _ -> {:error, :invalid_username}
+      [[val]] ->
+        if(val == hash_pwd(pwd)) do
+          true
+        else
+          {:error, :invalid_pwd}
+        end
+      _ ->
+        {:error, :invalid_username}
     end
   end
 

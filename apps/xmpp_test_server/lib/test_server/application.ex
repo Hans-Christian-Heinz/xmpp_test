@@ -19,7 +19,8 @@ defmodule XmppTestServer.Application do
       {Task.Supervisor, name: XmppTestServer.TaskSupervisor},
       Supervisor.child_spec({Task, fn -> XmppTestServer.accept(port) end}, restart: :permanent),
       {MyXQL, name: :myxql, hostname: host, database: db_name, username: db_username, password: db_pwd},
-      {XmppTestServer.Users, name: :users}
+      {XmppTestServer.Users, name: :users},
+      {Registry, keys: :unique, name: Users.Registry}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
