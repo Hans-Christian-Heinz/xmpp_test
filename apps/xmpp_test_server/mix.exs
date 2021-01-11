@@ -9,7 +9,8 @@ defmodule XmppTestServer.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.11",
+      # elixir: "~> 1.11",
+      elixir: "~> 1.7.4",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -35,7 +36,9 @@ defmodule XmppTestServer.MixProject do
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       # {:sibling_app_in_umbrella, in_umbrella: true}
-      {:xmpp_test_parser, in_umbrella: true}
+      {:xmpp_test_parser, in_umbrella: true},
+      {:myxql, "~> 0.4.0"},
+      {:bcrypt_elixir, "~> 2.3.0"}
     ]
   end
 end

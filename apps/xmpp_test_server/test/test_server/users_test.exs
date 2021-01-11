@@ -56,10 +56,10 @@ defmodule XmppTestServer.UsersTest do
   end
 
   test "is_registered", %{users: users} do
-    assert false == Users.is_registered?(users, "mustermann")
+    assert {"mustermann", false} == Users.is_registered?(users, "mustermann")
     Users.register(users, "mustermann", "Test1234")
-    assert true == Users.is_registered?(users, "mustermann")
+    assert {"mustermann", true} == Users.is_registered?(users, "mustermann")
     Users.delete(users, "mustermann", "Test1234")
-    assert false == Users.is_registered?(users, "mustermann")
+    assert {"mustermann", false} == Users.is_registered?(users, "mustermann")
   end
 end

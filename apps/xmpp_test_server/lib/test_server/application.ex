@@ -17,7 +17,7 @@ defmodule XmppTestServer.Application do
     # Child processes to supervise
     children = [
       {Task.Supervisor, name: XmppTestServer.TaskSupervisor},
-      {DynamicSupervisor, name: Users.Supervisor, strategy: :one_for_one},
+#      {DynamicSupervisor, name: Users.Supervisor, strategy: :one_for_one},
       Supervisor.child_spec({Task, fn -> XmppTestServer.accept(port) end}, restart: :permanent),
       {MyXQL, name: :myxql, hostname: host, database: db_name, username: db_username, password: db_pwd},
       {XmppTestServer.Users, name: :users},

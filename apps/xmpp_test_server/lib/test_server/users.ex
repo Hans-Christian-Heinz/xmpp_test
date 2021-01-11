@@ -55,7 +55,7 @@ defmodule XmppTestServer.Users do
   Check if a user with username 'username' is registered in the database.
   """
   def is_registered?(pid, username) do
-    GenServer.call(pid, {:is_registered?, username: username})
+    {username, GenServer.call(pid, {:is_registered?, username: username})}
   end
 
   # Callbacks
@@ -79,6 +79,7 @@ defmodule XmppTestServer.Users do
       {:ok, _} -> {:reply, :ok, state}
       # perhaps {:error, e} as reply?
       {:error, %MyXQL.Error{} = e} -> {:reply, {:error, e.message}, state}
+      # {:error, e} -> {:reply, {:error, e}, state}
     end
   end
 
@@ -90,6 +91,7 @@ defmodule XmppTestServer.Users do
         case MyXQL.query(:myxql, query) do
           {:ok, _} -> {:reply, :ok, state}
           {:error, %MyXQL.Error{} = e} -> {:reply, {:error, e.message}, state}
+          # {:error, e} -> {:reply, {:error, e}, state}
         end
       {:error, e} ->
         {:reply, {:error, e}, state}
@@ -138,7 +140,8 @@ defmodule XmppTestServer.Users do
     # valid result: exactly one value (one row and one column)
     case res.rows do
       [[val]] ->
-        if(val == hash_pwd(pwd)) do
+        if(Bcrypt.verify_pass(pwd, val)) do
+        # if(val == hash_pwd(pwd)) do
           true
         else
           {:error, :invalid_pwd}
@@ -149,9 +152,6 @@ defmodule XmppTestServer.Users do
   end
 
   defp hash_pwd(pwd) do
-    # TODO
-    # module Bcrypt doesn't work at the moment. (C-compiler?, vcpp-build-tools?, nmake?)
-    # try again later
-    pwd
+    Bcrypt.add_hash(pwd).password_hash
   end
 end
