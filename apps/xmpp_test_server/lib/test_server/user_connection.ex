@@ -19,11 +19,33 @@ defmodule XmppTestServer.UserConnection do
         serve(state)
       username ->
         :gen_tcp.send(socket, "Hello #{username}.")
-        # TODO
+        :gen_tcp.send(socket, "auth_complete")
+        serve_stanzas(state)
     end
   end
 
-  # login_prompt: useris prompted to login or register.
+  # serve-loop when authentification was successful.
+  defp serve_stanzas(state) do
+    socket = state.socket
+    # username = state.username
+    with {:ok, msg} <- :gen_tcp.recv(socket, 0),
+         {:ok, stanza} <- XmppTestParser.parse(msg),
+         {:ok, resp} = XmppTestServer.ProcessStanzas.process(state, stanza)
+    do
+      :gen_tcp.send(socket, resp)
+      serve_stanzas(state)
+    else
+      # TODO: clearer error-returns when parsing
+      {:error, :invalid_message} ->
+        :gen_tcp.send(socket, "Invalid message received. Please try again. \n")
+        serve_stanzas(state)
+      _ ->
+        :gen_tcp.close(socket)
+        Process.exit(self(), :socket_closed)
+    end
+  end
+
+  # login_prompt: user is prompted to login or register.
   defp login_prompt(socket, state) do
     # :ok = :gen_tcp.send(socket, "Login or register:\nUsername: ")
     :gen_tcp.send(socket, "Login or register:\nUsername: ")
@@ -32,7 +54,7 @@ defmodule XmppTestServer.UserConnection do
          {:ok, username} <- XmppTestServer.InputValidator.validate(data, [type: :username]),
          {_, true} <- XmppTestServer.Users.is_registered?(:users, username),
          {:ok, pwd} <- pwd_prompt(socket),
-         :ok <- XmppTestServer.Users.login(:users, username, pwd)
+         :ok <- XmppTestServer.Users.login(:users, username, pwd, socket)
     do
       {:ok, Map.put(state, :username, username)}
     else
@@ -94,7 +116,7 @@ defmodule XmppTestServer.UserConnection do
            {:ok, pwd_rep} <- pwd_prompt(socket),
            :ok <- if(pwd == pwd_rep, do: :ok, else: {:error, "Password repetition failed. Please try again."}),
            :ok <- XmppTestServer.Users.register(:users, username, pwd),
-           :ok <- XmppTestServer.Users.login(:users, username, pwd)
+           :ok <- XmppTestServer.Users.login(:users, username, pwd, socket)
       do
         {:ok, Map.put(state, :username, username)}
       else

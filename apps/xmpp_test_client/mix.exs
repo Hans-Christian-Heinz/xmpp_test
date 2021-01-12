@@ -18,7 +18,7 @@ defmodule XmppTestClient.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :xmpp_test_server],
+      extra_applications: [:logger],
       mod: {XmppTestClient.Application, []}
     ]
   end
@@ -30,7 +30,7 @@ defmodule XmppTestClient.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       # {:sibling_app_in_umbrella, in_umbrella: true},
       {:xmpp_test_parser, in_umbrella: true},
-      {:xmpp_test_server, in_umbrella: true}
+      # {:xmpp_test_server, in_umbrella: true}
     ]
   end
 end

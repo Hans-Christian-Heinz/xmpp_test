@@ -38,10 +38,10 @@ defmodule XmppTestServer.Users do
   end
 
   @doc """
-  Login as a given user with username 'username' and password 'pwd'.
+  Login as a given user with username 'username' and password 'pwd' on the socket 'socket'.
   """
-  def login(pid, username, pwd) do
-    GenServer.call(pid, {:login, username: username, pwd: pwd})
+  def login(pid, username, pwd, socket) do
+    GenServer.call(pid, {:login, username: username, pwd: pwd, socket: socket})
   end
 
   @doc """
@@ -99,10 +99,10 @@ defmodule XmppTestServer.Users do
   end
 
   @impl true
-  def handle_call({:login, username: username, pwd: pwd}, _from, state) do
+  def handle_call({:login, username: username, pwd: pwd, socket: socket}, _from, state) do
     case check_pwd(username, pwd) do
       true ->
-        case Registry.register(Users.Registry, username, nil) do
+        case Registry.register(Users.Registry, username, socket) do
           {:ok, _} -> {:reply, :ok, state}
           {:error, e} -> {:reply, {:error, e}, state}
         end

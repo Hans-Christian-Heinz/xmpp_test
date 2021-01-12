@@ -14,6 +14,7 @@ defmodule XmppTestClient.Application do
     children = [
       # Starts a worker by calling: XmppTestClient.Worker.start_link(arg)
       # {XmppTestClient.Worker, arg},
+      {Task.Supervisor, name: XmppTestClient.TaskSupervisor},
       Supervisor.child_spec({Task, fn -> XmppTestClient.connect(server, port, packet) end}, restart: :permanent),
     ]
 
