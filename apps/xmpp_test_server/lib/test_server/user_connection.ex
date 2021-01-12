@@ -1,6 +1,9 @@
 defmodule XmppTestServer.UserConnection do
   @moduledoc ~S"""
   Module for a connection associated to a user.
+
+  ## Functions
+  + serve/1
   """
 
   @doc """
@@ -16,6 +19,7 @@ defmodule XmppTestServer.UserConnection do
         serve(state)
       username ->
         :gen_tcp.send(socket, "Hello #{username}.")
+        # TODO
     end
   end
 
@@ -88,7 +92,7 @@ defmodule XmppTestServer.UserConnection do
 
       with {:ok, pwd} <- pwd_prompt(socket),
            {:ok, pwd_rep} <- pwd_prompt(socket),
-           :ok <- if(pwd == pwd_rep, do: :ok, else: {:error, "Password  repetition failed. Please try again."}),
+           :ok <- if(pwd == pwd_rep, do: :ok, else: {:error, "Password repetition failed. Please try again."}),
            :ok <- XmppTestServer.Users.register(:users, username, pwd),
            :ok <- XmppTestServer.Users.login(:users, username, pwd)
       do

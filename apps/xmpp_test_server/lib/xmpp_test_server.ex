@@ -1,7 +1,10 @@
 defmodule XmppTestServer do
-  @moduledoc """
+  @moduledoc ~S"""
   Module for an Xmpp-Server: accept-function is called on starting the application.
   Server accepts TCP-connections on a port (Env-variable, default: 5222) and handles them.
+
+  ## Functions
+  + accept/1
   """
 
   require Logger

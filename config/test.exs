@@ -7,4 +7,5 @@ config :xmpp_test_server,
   MYSQL_DB: "xmpp_test_testing",
   MYSQL_USER: "xmpp",
   MYSQL_PWD: "Test1234",
-  XMPP_PACKET: 2
+  XMPP_PACKET: 2,
+  XMPP_SERVER: '127.0.0.1'

@@ -1,6 +1,9 @@
 defmodule XmppTestServer.InputValidator do
   @moduledoc ~S"""
   Module for input-validation.
+
+  ## Functions
+  + validate/2
   """
 
   @doc ~S"""
