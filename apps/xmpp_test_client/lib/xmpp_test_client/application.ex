@@ -6,9 +6,7 @@ defmodule XmppTestClient.Application do
   use Application
 
   def start(_type, _args) do
-    server = Application.get_env(:xmpp_test_client, :XMPP_SERVER, "127.0.0.1")
-    port = Application.get_env(:xmpp_test_client, :XMPP_PORT, "5222")
-    packet = Application.get_env(:xmpp_test_client, :XMPP_PACKET, 2)
+    {server, port} = config()
 
     # List all child processes to be supervised
     children = [
@@ -22,6 +20,13 @@ defmodule XmppTestClient.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: XmppTestClient.Supervisor]
     Supervisor.start_link(children, opts)
-    Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> XmppTestClient.connect(server, port, packet) end, restart: :permanent)
+    Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> XmppTestClient.connect(server, port, 2) end, restart: :permanent)
+  end
+
+  defp config() do
+    server = Application.get_env(:xmpp_test_client, :XMPP_SERVER, "127.0.0.1") |> String.to_charlist
+    port = Application.get_env(:xmpp_test_client, :XMPP_PORT, "5222") |> String.to_integer
+
+    {server, port}
   end
 end

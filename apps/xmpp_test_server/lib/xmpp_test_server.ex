@@ -20,9 +20,8 @@ defmodule XmppTestServer do
     #                  that specifies the number of bytes in the packet (max: 2Gb)
     # 3. 'active: false' - blocks on ':gen_tcp.recv/2' until data is available
     # 4. 'reuseaddr: true' - allows to reuse the address if the listener crashes
-    packet = Application.get_env(:xmpp_test_server, :XMPP_PACKET, 2)
     {:ok, socket} =
-      :gen_tcp.listen(port, [:binary, packet: packet, active: false, reuseaddr: true])
+      :gen_tcp.listen(port, [:binary, packet: 2, active: false, reuseaddr: true])
       # :gen_tcp.listen(port, [:binary, packet: 2, active: false, reuseaddr: true])
     Logger.info("Accepting connections on port #{port}")
     loop_acceptor(socket)

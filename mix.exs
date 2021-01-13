@@ -7,7 +7,19 @@ defmodule XmppTest.MixProject do
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      releases: [
+        server: [
+          version: "0.0.1",
+          applications: [xmpp_test_server: :permanent],
+          runtime_config_path: "config/releases/server.exs"
+        ],
+        client: [
+          version: "0.0.1",
+          applications: [xmpp_test_client: :permanent],
+          runtime_config_path: "config/releases/client.exs"
+        ]
+      ]
     ]
   end
 

@@ -1,5 +1,5 @@
 defmodule XmppTestServer.UsersTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   alias XmppTestServer.Users, as: Users
 
   setup context do

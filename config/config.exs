@@ -7,8 +7,8 @@
 # all use the same configuration file. If you want different
 # configurations or dependencies per app, it is best to
 # move said applications out of the umbrella.
-# import Config
-use Mix.Config
+import Config
+# use Mix.Config
 
 # Sample configuration:
 #
@@ -18,7 +18,5 @@ use Mix.Config
 #       metadata: [:user_id]
 #
 
-# TODO: dynamic config: release
-
-#import_config "#{config_env()}.exs"
-import_config "#{Mix.env()}.exs"
+import_config "#{config_env()}.exs"
+# import_config "#{Mix.env()}.exs"

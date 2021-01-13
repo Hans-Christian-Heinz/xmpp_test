@@ -11,8 +11,7 @@ defmodule XmppTestClientTest do
   setup do
     server = Application.get_env(:xmpp_test_client, :XMPP_SERVER, "127.0.0.1")
     port = Application.get_env(:xmpp_test_client, :XMPP_PORT, "5222")
-    packet = Application.get_env(:xmpp_test_client, :XMPP_PACKET, 2)
-    %{server: server, port: port, packet: packet}
+    %{server: server, port: port, packet: 2}
   end
 
   # I don't really know how to test this on the client side
