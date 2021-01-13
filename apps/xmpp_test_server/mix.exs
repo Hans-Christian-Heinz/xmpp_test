@@ -12,7 +12,8 @@ defmodule XmppTestServer.MixProject do
       # elixir: "~> 1.11",
       elixir: "~> 1.7.4",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -39,6 +40,12 @@ defmodule XmppTestServer.MixProject do
       {:xmpp_test_parser, in_umbrella: true},
       {:myxql, "~> 0.4.0"},
       {:bcrypt_elixir, "~> 2.3.0"}
+    ]
+  end
+
+  defp aliases do
+    [
+#      test: "test --no-start"
     ]
   end
 end

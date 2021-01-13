@@ -1,9 +1,10 @@
 defmodule XmppTestClient do
-  alias XmppTestParser.Structs.Presence, as: Presence
+#  alias XmppTestParser.Structs.Presence, as: Presence
   alias XmppTestParser.Structs.Message, as: Message
   alias XmppTestParser.Structs.IQ, as: IQ
-  alias XmppTestParser.Structs.Query, as: Query
-  alias XmppTestParser.Structs.Item, as: Item
+  alias XmppTestParser.Structs.Stream, as: Stream
+#  alias XmppTestParser.Structs.Query, as: Query
+#  alias XmppTestParser.Structs.Item, as: Item
 
   @moduledoc ~S"""
   Documentation for XmppTestClient.
@@ -19,6 +20,9 @@ defmodule XmppTestClient do
     opts = [:binary, packet: packet, active: false]
     {:ok, socket} = :gen_tcp.connect(server, port, opts)
     dialog(socket)
+    # dialog-loop and receive-loop (print_response) under the same supervision tree
+    # doesn't work, because the calling process will die afterwards
+    # {:ok, _pid} = Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> dialog(socket) end)
   end
 
   # Dialog between client and server.
@@ -32,7 +36,7 @@ defmodule XmppTestClient do
       {:complete, data} ->
         IO.puts(data <> "\n")
         # start a new task to listen for messages
-        {:ok, pid} = Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> print_response(socket) end)
+        {:ok, _pid} = Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> print_response(socket) end)
         ui(socket)
     end
   end
@@ -68,8 +72,13 @@ defmodule XmppTestClient do
   defp print_response(socket) do
     {:ok, data} = :gen_tcp.recv(socket, 0)
     {:ok, stanza} = XmppTestParser.parse(data)
-    print_help(stanza)
-    print_response(socket)
+    case print_help(stanza) do
+      :logout ->
+        :gen_tcp.shutdown(socket, :read)
+        Application.stop(:xmpp_test_client)
+      _ ->
+        print_response(socket)
+    end
   end
 
   defp print_help(%IQ{} = iq) do
@@ -81,6 +90,13 @@ defmodule XmppTestClient do
   defp print_help(%Message{} = msg) do
     IO.puts "Incoming message from #{to_string(msg.from)}:"
     IO.puts to_string(msg.body) <> "\n"
+  end
+
+  defp print_help(%Stream{} = stream) do
+    case stream.stop do
+      true -> :logout
+      false -> :ok
+    end
   end
 
   defp print_help(_) do

@@ -39,8 +39,9 @@ defmodule XmppTestServer.Users do
 
   @doc """
   Login as a given user with username 'username' and password 'pwd' on the socket 'socket'.
+  'socket' can be nil, because the variable is only used to associate it to the process and user in the registry.
   """
-  def login(pid, username, pwd, socket) do
+  def login(pid, username, pwd, socket \\ nil) do
     GenServer.call(pid, {:login, username: username, pwd: pwd, socket: socket})
   end
 
@@ -56,6 +57,13 @@ defmodule XmppTestServer.Users do
   """
   def is_registered?(pid, username) do
     {username, GenServer.call(pid, {:is_registered?, username: username})}
+  end
+
+  @doc """
+  Check if a user with the username 'username' is already logged in.
+  """
+  def is_logged_in?(pid, username) do
+    GenServer.call(pid, {:is_logged_in?, username: username})
   end
 
   # Callbacks
@@ -127,6 +135,15 @@ defmodule XmppTestServer.Users do
     case MyXQL.query(:myxql, query) do
       {:ok, res} -> {:reply, res.rows != [], state}
       {:error, e} -> {:reply, {:error, e}, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:is_logged_in?, username: username}, _from, state) do
+    if(logged_in?(username)) do
+      {:reply, {:is_logged_in?, username, true}, state}
+    else
+      {:reply, {:is_logged_in?, username, false}, state}
     end
   end
 

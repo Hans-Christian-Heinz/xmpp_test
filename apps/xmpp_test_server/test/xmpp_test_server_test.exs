@@ -1,8 +1,8 @@
 defmodule XmppTestServerTest do
   use ExUnit.Case, async: true
 
-  test "server start" do
+#  test "server start" do
     # TODO
-    assert true
-  end
+#    assert true
+#  end
 end

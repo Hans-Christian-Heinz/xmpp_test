@@ -9,3 +9,11 @@ config :xmpp_test_server,
   MYSQL_PWD: "Test1234",
   XMPP_PACKET: 2,
   XMPP_SERVER: '127.0.0.1'
+
+config :xmpp_test_client,
+  XMPP_SERVER: '127.0.0.1',
+  XMPP_PORT: 5222,
+  XMPP_PACKET: 2
+
+config :logger,
+  level: :error

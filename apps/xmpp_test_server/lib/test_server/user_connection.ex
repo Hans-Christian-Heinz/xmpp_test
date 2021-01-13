@@ -53,6 +53,7 @@ defmodule XmppTestServer.UserConnection do
     with {:ok, data} <- :gen_tcp.recv(socket, 0),
          {:ok, username} <- XmppTestServer.InputValidator.validate(data, [type: :username]),
          {_, true} <- XmppTestServer.Users.is_registered?(:users, username),
+         {:is_logged_in?, _, false} <- XmppTestServer.Users.is_logged_in?(:users, username),
          {:ok, pwd} <- pwd_prompt(socket),
          :ok <- XmppTestServer.Users.login(:users, username, pwd, socket)
     do
@@ -60,6 +61,9 @@ defmodule XmppTestServer.UserConnection do
     else
       {username, false} ->
         register_prompt(socket, username, state)
+      {:is_logged_in?, username, true} ->
+        :gen_tcp.send(socket, "The user #{username} is already logged in.\n\n")
+        {:ok, state}
       {:error, msg} when is_binary(msg) ->
         :gen_tcp.send(socket, msg <> "\n\n")
         {:ok, state}

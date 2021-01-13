@@ -1,5 +1,5 @@
 defmodule XmppTestServer.UsersTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias XmppTestServer.Users, as: Users
 
   setup context do
@@ -61,5 +61,15 @@ defmodule XmppTestServer.UsersTest do
     assert {"mustermann", true} == Users.is_registered?(users, "mustermann")
     Users.delete(users, "mustermann", "Test1234")
     assert {"mustermann", false} == Users.is_registered?(users, "mustermann")
+  end
+
+  test "is_logged_in", %{users: users} do
+    assert {:is_logged_in?, "mustermann", false} == Users.is_logged_in?(users, "mustermann")
+    Users.register(users, "mustermann", "Test1234")
+    assert {:is_logged_in?, "mustermann", false} == Users.is_logged_in?(users, "mustermann")
+    Users.login(users, "mustermann", "Test1234")
+    assert {:is_logged_in?, "mustermann", true} == Users.is_logged_in?(users, "mustermann")
+    Users.logout(users, "mustermann")
+    assert {:is_logged_in?, "mustermann", false} == Users.is_logged_in?(users, "mustermann")
   end
 end

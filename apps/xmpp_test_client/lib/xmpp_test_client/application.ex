@@ -14,13 +14,14 @@ defmodule XmppTestClient.Application do
     children = [
       # Starts a worker by calling: XmppTestClient.Worker.start_link(arg)
       # {XmppTestClient.Worker, arg},
-      {Task.Supervisor, name: XmppTestClient.TaskSupervisor},
-      Supervisor.child_spec({Task, fn -> XmppTestClient.connect(server, port, packet) end}, restart: :permanent),
+      {Task.Supervisor, name: XmppTestClient.TaskSupervisor, strategy: :one_for_all},
+      # Supervisor.child_spec({Task, fn -> XmppTestClient.connect(server, port, packet) end}, restart: :permanent),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: XmppTestClient.Supervisor]
     Supervisor.start_link(children, opts)
+    Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> XmppTestClient.connect(server, port, packet) end, restart: :permanent)
   end
 end

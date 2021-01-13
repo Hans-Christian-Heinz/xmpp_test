@@ -113,7 +113,7 @@ defmodule XmppTestParser do
 
   def to_xml(%Query{} = query) do
     {:ok, "<query"
-      |> Kernel.<>(if query.xmlns, do: ~s| xmlns="#{query.xmlns}"|, else: "")
+#      |> Kernel.<>(if query.xmlns, do: ~s| xmlns="#{query.xmlns}"|, else: "")
       |> Kernel.<>(">")
       |> Kernel.<>(Enum.map(query.items, &to_xml!/1) |> Enum.reduce("", fn(b, a) -> a<>b end))
       |> Kernel.<>("</query>")
@@ -190,7 +190,7 @@ defmodule XmppTestParser do
         query: %Query{
           # xmlns doesn't count as an attribute => problem
           # TODO solve the problem
-          xmlns: xpath(string_to_parse, ~x"//iq/query/@xmlns"),
+#          xmlns: xpath(string_to_parse, ~x"//iq/query/@xmlns"),
           # problem: count == 0
           items: case xpath(string_to_parse, ~x"count(//iq/query/item)") do
             0 -> []

@@ -64,7 +64,7 @@ defmodule XmppTestParserTest do
   test "iq-stanzas" do
     # multiple items (query-results)
     xml = ~s|<iq type="type" from="from" to="to" id="id">
-                <query xmlns="namespace">
+                <query>
                   <item jid="jid1" name="name1"/>
                   <item jid="jid2" name="name2"/>
                 </query>
@@ -75,17 +75,17 @@ defmodule XmppTestParserTest do
       to: 'to',
       id: 'id',
       query: %Query{
-        xmlns: :namespace,
+#        xmlns: :namespace,
         items: [
-          %Item{jid: "jid1", name: "name1"},
-          %Item{jid: "jid2", name: "name2"}
+          %Item{jid: 'jid1', name: 'name1'},
+          %Item{jid: 'jid2', name: 'name2'}
         ]
       }
     }} == XmppTestParser.parse(xml)
 
     # one item
     xml = ~s|<iq type="type" from="from" to="to" id="id">
-                <query xmlns="namespace">
+                <query>
                   <item jid="jid1" name="name1"/>
                 </query>
               </iq>|
@@ -96,15 +96,15 @@ defmodule XmppTestParserTest do
       id: 'id',
       query: %Query{
         items: [
-          %Item{jid: "jid1", name: "name1"}
+          %Item{jid: 'jid1', name: 'name1'}
         ],
-        xmlns: :namespace,
+#        xmlns: :namespace,
       }
     }} == XmppTestParser.parse(xml)
 
     # no items
     xml = ~s|<iq type="type" from="from" to="to" id="id">
-                <query xmlns="namespace">
+                <query>
                 </query>
               </iq>|
     assert {:ok, %IQ{
@@ -113,7 +113,7 @@ defmodule XmppTestParserTest do
       to: 'to',
       id: 'id',
       query: %Query{
-        xmlns: :namespace,
+  #      xmlns: :namespace,
         items: []
       }
     }} == XmppTestParser.parse(xml)
@@ -182,7 +182,7 @@ defmodule XmppTestParserTest do
       type: "type",
       id: "id",
       query: %Query{
-        xmlns: "namespace",
+  #      xmlns: "namespace",
         items: [
           %Item{jid: "jid1", name: "name1"},
           %Item{jid: "jid2", name: "name2"}
@@ -190,7 +190,7 @@ defmodule XmppTestParserTest do
       }
     }
     assert XmppTestParser.to_xml(iq) == {:ok,
-      ~s|<iq from="from" to="to" type="type" id="id"><query xmlns="namespace"><item jid="jid1" name="name1"/><item jid="jid2" name="name2"/></query></iq>|
+      ~s|<iq from="from" to="to" type="type" id="id"><query><item jid="jid1" name="name1"/><item jid="jid2" name="name2"/></query></iq>|
     }
 
     iq = %IQ{

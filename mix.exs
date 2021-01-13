@@ -6,7 +6,8 @@ defmodule XmppTest.MixProject do
       apps_path: "apps",
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -24,6 +25,13 @@ defmodule XmppTest.MixProject do
       # {:myxql, "~> 0.4.0"},
       # {:mariaex, "~> 0.9.1"}
       # {:bcrypt_elixir, "~> 2.3.0"}
+      {:mock, "~> 0.3.0", only: :test}
+    ]
+  end
+
+  defp aliases do
+    [
+      test: "test --no-start"
     ]
   end
 end

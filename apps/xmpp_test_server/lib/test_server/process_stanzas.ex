@@ -18,8 +18,8 @@ defmodule XmppTestServer.ProcessStanzas do
   def process(state, %Presence{} = presence) do
     if(presence.type == 'unavailable' || presence.type == "unavailable") do
       username = state.username
-      IO.puts username
-      XmppTestServer.Users.logout(:users, username)
+      :ok = XmppTestServer.Users.logout(:users, username)
+      {:ok, "</stream:stream>"}
     end
   end
 
