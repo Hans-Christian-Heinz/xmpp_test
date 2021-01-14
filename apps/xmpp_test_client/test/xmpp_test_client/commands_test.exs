@@ -1,5 +1,5 @@
 defmodule XmppTestClient.CommandsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import Mock
   alias XmppTestClient.Commands, as: Commands
 

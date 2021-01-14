@@ -12,7 +12,9 @@ and vice versa.
 
 ## XmppTestServer
 
-When starting the server (*\_build/prod/rel/server/bin/server start* or *cd apps/xmpp_test_server* followed by *mix run --no-halt*) you are asked for some configuration-info:
+When starting the server (*\_build/prod/rel/server/bin/server start* or
+  *cd apps/xmpp_test_server* followed by *mix run --no-halt*) you are asked for
+  some configuration-info:
 + mysql-host: the location of the database-server containing user-information
 + database-name: the name of the database containing user-information
 + mysql-user: the user, that is to access the database
@@ -24,7 +26,9 @@ for connections. To stop the server, press *ctrl+c*.
 
 ## XmppTestClient
 
-When starting the client (*\_build/prod/rel/client/bin/client start* or *cd apps/xmpp_test_client* followed by *mix run --no-halt*) you are asked for some configuration-info:
+When starting the client (*\_build/prod/rel/client/bin/client start* or
+  *cd apps/xmpp_test_client* followed by *mix run --no-halt*) you are asked for
+  some configuration-info:
 + xmpp-server: the location of the XmppTestServer to connect to
 + xmpp-port: the port on which to connect to the server  
 

@@ -1,7 +1,6 @@
 defmodule XmppTestClientTest do
   use ExUnit.Case, async: true
   import Mock
-  require Logger
 
   setup do
     Application.stop :xmpp_test_server

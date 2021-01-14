@@ -12,12 +12,14 @@ defmodule XmppTest.MixProject do
         server: [
           version: "0.0.1",
           applications: [xmpp_test_server: :permanent],
-          runtime_config_path: "config/releases/server.exs"
+          runtime_config_path: "config/releases/server.exs",
+          rel_templates_path: "rel/server"
         ],
         client: [
           version: "0.0.1",
           applications: [xmpp_test_client: :permanent],
-          runtime_config_path: "config/releases/client.exs"
+          runtime_config_path: "config/releases/client.exs",
+          rel_templates_path: "rel/client"
         ]
       ]
     ]
