@@ -11,6 +11,7 @@ defmodule XmppTestClient do
   Documentation for XmppTestClient.
   It is a bit of a mess, because the authentication is separate from the rest,
   should be changed.
+  Also perhaps put the print_response/1-loop in another module.
 
   ## Functions
   + connect/3
@@ -28,7 +29,7 @@ defmodule XmppTestClient do
     # {:ok, _pid} = Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> dialog(socket) end)
   end
 
-  # Dialog between client and server.
+  # Dialog between client and server. (Login-dialog)
   defp dialog(socket) do
     # for some reason I get a compile-error when trying to use default args
     case receive(socket, 1000, "") do
@@ -72,6 +73,8 @@ defmodule XmppTestClient do
     end
   end
 
+  # should perhaps be a public function for testing purposes.
+  # alternative: define macro defp_testable
   defp print_response(socket) do
     with {:ok, data} <- :gen_tcp.recv(socket, 0),
          {:ok, stanza} <- XmppTestParser.parse(data),
@@ -90,7 +93,13 @@ defmodule XmppTestClient do
       {:error, :invalid_message} ->
         Logger.error "An error has occured when parsing the server's message."
         print_response(socket)
-      # no fallback-clause for now.
+      {:error, :not_supported} ->
+        Logger.error "An error has occured: This client doesn't support the received message."
+        print_response(socket)
+      {:error, msg} when is_binary(smg) ->
+        Logger.error "An error has occured: #{msg}"
+        System.stop(1)
+      # no fallback-clause for now. (Would result in a generic error message that doesn't indicate where the error lies.)
     end
   end
 
@@ -114,6 +123,6 @@ defmodule XmppTestClient do
   end
 
   defp print_help(_) do
-    :not_implemented
+    {:error, :not_supported}
   end
 end

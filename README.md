@@ -22,7 +22,10 @@ When starting the server (*\_build/prod/rel/server/bin/server start* or
 + xmpp-port: the tcp-port on which to listen for connections  
 
 Once the configuration-information is entered, the server is started and listens
-for connections. To stop the server, press *ctrl+c*.
+for connections. To stop the server, press *ctrl+c*.  
+The server can also be started as a daemon:
+*\_build/prod/rel/server/bin/server daemon*. In that case it is stopped with
+*\_build/prod/rel/server/bin/server stop*.
 
 ## XmppTestClient
 
