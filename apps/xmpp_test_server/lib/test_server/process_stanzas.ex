@@ -55,7 +55,7 @@ defmodule XmppTestServer.ProcessStanzas do
   def process(state, %Message{} = msg) do
     case Registry.select(Users.Registry, [{{:"$1", :_, :"$2"}, [{:==, :"$1", to_string(msg.to)}], [:"$2"]}]) do
       [] ->
-        %Message{from: "server", body: "The user #{msg.to} is not available. Your message was not sent."} |> XmppTestParser.to_xml
+        send_responses([{state.socket, %Message{from: "server", body: "The user #{msg.to} is not available. Your message was not sent."} |> XmppTestParser.to_xml!}])
       [socket] ->
         {:ok, msg1} = %Message{from: "server", body: "Message sent."} |> XmppTestParser.to_xml
         {:ok, msg2} = %{msg | from: state.username} |> XmppTestParser.to_xml
@@ -76,8 +76,8 @@ defmodule XmppTestServer.ProcessStanzas do
   # end
 
   defp send_responses(responses) when is_list(responses) do
-    (for resp <- responses, do: :gen_tcp.send(elem(resp,0), elem(resp, 1))) |>
-      Enum.all?(&(&1 === :ok)) |>
-      if(do: :ok, else: :error)
+    (for resp <- responses, do: :gen_tcp.send(elem(resp,0), elem(resp, 1)))
+      |> Enum.all?(&(&1 === :ok))
+      |> if(do: :ok, else: :error)
   end
 end

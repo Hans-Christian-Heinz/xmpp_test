@@ -36,7 +36,7 @@ defmodule XmppTestClient do
         :gen_tcp.send(socket, input)
         dialog(socket)
       {:complete, data} ->
-        IO.puts(data <> "\n")
+        IO.puts(data)
         # start a new task to listen for messages
         {:ok, _pid} = Task.Supervisor.start_child(XmppTestClient.TaskSupervisor, fn -> print_response(socket) end)
         ui(socket)
@@ -87,7 +87,8 @@ defmodule XmppTestClient do
   defp print_help(%IQ{} = iq) do
     # TODO differentiate between different types of query
     # proble: name is charlist not string
-    iq.query.items |> Enum.map(fn i -> IO.puts(to_string(i.name) <> "\n") end)
+    iq.query.items |> Enum.map(fn i -> IO.puts(to_string(i.name)) end)
+    IO.write "\n"
   end
 
   defp print_help(%Message{} = msg) do
