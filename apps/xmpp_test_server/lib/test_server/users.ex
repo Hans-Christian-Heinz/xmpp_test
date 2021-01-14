@@ -41,7 +41,7 @@ defmodule XmppTestServer.Users do
   Login as a given user with username 'username' and password 'pwd' on the socket 'socket'.
   'socket' can be nil, because the variable is only used to associate it to the process and user in the registry.
   """
-  def login(pid, username, pwd, socket \\ nil) do
+  def login(_pid, username, pwd, socket \\ nil) do
     # GenServer.call(pid, {:login, username: username, pwd: pwd, socket: socket})
     case check_pwd(username, pwd) do
       true ->
