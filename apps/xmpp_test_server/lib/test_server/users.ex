@@ -56,8 +56,13 @@ defmodule XmppTestServer.Users do
   @doc """
   Logout the given user with username 'username'.
   """
-  def logout(pid, username) do
-    GenServer.call(pid, {:logout, username: username})
+  def logout(_pid, username) do
+    # GenServer.call(pid, {:logout, username: username})
+    if (logged_in?(username)) do
+      Registry.unregister(Users.Registry, username)
+    else
+      {:error, :not_logged_in}
+    end
   end
 
   @doc """
@@ -131,15 +136,15 @@ defmodule XmppTestServer.Users do
   #   end
   # end
 
-  @impl true
-  def handle_call({:logout, username: username}, _from, state) do
-    if (logged_in?(username)) do
-      :ok = Registry.unregister(Users.Registry, username)
-      {:reply, :ok, state}
-    else
-      {:reply, {:error, :not_logged_in}, state}
-    end
-  end
+  # @impl true
+  # def handle_call({:logout, username: username}, _from, state) do
+  #   if (logged_in?(username)) do
+  #     :ok = Registry.unregister(Users.Registry, username)
+  #     {:reply, :ok, state}
+  #   else
+  #     {:reply, {:error, :not_logged_in}, state}
+  #   end
+  # end
 
   @impl true
   def handle_call({:is_registered?, username: username}, _from, state) do
