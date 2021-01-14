@@ -42,7 +42,15 @@ defmodule XmppTestServer.Users do
   'socket' can be nil, because the variable is only used to associate it to the process and user in the registry.
   """
   def login(pid, username, pwd, socket \\ nil) do
-    GenServer.call(pid, {:login, username: username, pwd: pwd, socket: socket})
+    # GenServer.call(pid, {:login, username: username, pwd: pwd, socket: socket})
+    case check_pwd(username, pwd) do
+      true ->
+        case Registry.register(Users.Registry, username, socket) do
+          {:ok, _} -> :ok
+          {:error, e} -> {:error, e}
+        end
+      {:error, e} -> {:error, e}
+    end
   end
 
   @doc """
@@ -106,18 +114,22 @@ defmodule XmppTestServer.Users do
     end
   end
 
-  @impl true
-  def handle_call({:login, username: username, pwd: pwd, socket: socket}, _from, state) do
-    case check_pwd(username, pwd) do
-      true ->
-        case Registry.register(Users.Registry, username, socket) do
-          {:ok, _} -> {:reply, :ok, state}
-          {:error, e} -> {:reply, {:error, e}, state}
-        end
-      {:error, e} ->
-        {:reply, {:error, e}, state}
-    end
-  end
+  # @impl true
+  # def handle_call({:login, username: username, pwd: pwd, socket: socket}, _from, state) do
+  #   case check_pwd(username, pwd) do
+  #     true ->
+  #       # looking at it again this seems strange: it seems that I always save the :users
+  #       # process in the registry rather than the calling process.
+  #       # If the calling process dies, the registry-entry remains.
+  #       # This should be changed.
+  #       case Registry.register(Users.Registry, username, socket) do
+  #         {:ok, _} -> {:reply, :ok, state}
+  #         {:error, e} -> {:reply, {:error, e}, state}
+  #       end
+  #     {:error, e} ->
+  #       {:reply, {:error, e}, state}
+  #   end
+  # end
 
   @impl true
   def handle_call({:logout, username: username}, _from, state) do

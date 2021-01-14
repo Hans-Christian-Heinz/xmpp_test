@@ -8,6 +8,8 @@ defmodule XmppTestClient do
 
   @moduledoc ~S"""
   Documentation for XmppTestClient.
+  It is a bit of a mess, because the authentication is separate from the rest,
+  should be changed.
 
   ## Functions
   + connect/3
@@ -75,7 +77,8 @@ defmodule XmppTestClient do
     case print_help(stanza) do
       :logout ->
         :gen_tcp.shutdown(socket, :read)
-        Application.stop(:xmpp_test_client)
+        # Application.stop(:xmpp_test_client)
+        System.stop()
       _ ->
         print_response(socket)
     end

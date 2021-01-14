@@ -15,6 +15,7 @@ defmodule XmppTestClientTest do
   end
 
   # I don't really know how to test this on the client side
+  # Should have connection with server and logic in different methods
   test "connect", %{server: server, port: port, packet: packet} do
     with_mock IO, [puts: &mock_puts/1, gets: &mock_gets/1] do
       XmppTestClient.connect(server, port, packet)
