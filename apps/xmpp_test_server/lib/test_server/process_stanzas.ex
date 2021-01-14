@@ -50,6 +50,8 @@ defmodule XmppTestServer.ProcessStanzas do
   #   end
   # end
 
+  # TODO this should be changed to return a list of {socket, stanza}-tuples that
+  # are sent in the calling method
   def process(state, %Message{} = msg) do
     case Registry.select(Users.Registry, [{{:"$1", :_, :"$2"}, [{:==, :"$1", to_string(msg.to)}], [:"$2"]}]) do
       [] ->
@@ -68,5 +70,11 @@ defmodule XmppTestServer.ProcessStanzas do
 
   defp sendMsg(msg, socket) do
     :gen_tcp.send(socket, msg)
+  end
+
+  # TODO use this function
+  defp sendResponses(responses) when is_list(responses) do
+    for resp <- resp, do: :gen_tcp.send(elem(resp,0), elem(resp, 1)) |>
+      Enum.reduce(fn (a, b) -> if(a == :ok and b == :ok, do: :ok, else: :error) end)
   end
 end
