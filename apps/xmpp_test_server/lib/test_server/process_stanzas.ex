@@ -13,17 +13,18 @@ defmodule XmppTestServer.ProcessStanzas do
   """
 
   @doc """
-  Process a stanza.
+  Process a stanza and send it or it's responses th their targets.
   """
   def process(state, %Presence{} = presence) do
     if(presence.type == 'unavailable' || presence.type == "unavailable") do
       username = state.username
       :ok = XmppTestServer.Users.logout(:users, username)
-      {:ok, "</stream:stream>"}
+      # {:ok, "</stream:stream>"}
+      send_responses([{state.socket, "</stream:stream>"}])
     end
   end
 
-  def process(_state, %IQ{} = _iq) do
+  def process(state, %IQ{} = _iq) do
     # so far only the query that asks for all available users
     # username = state.username
     # Registry.keys/2 returns the keys, under which one process is registered.
@@ -32,7 +33,8 @@ defmodule XmppTestServer.ProcessStanzas do
     users = Registry.select(Users.Registry, [{{:"$1", :_, :_}, [], [:"$1"]}]) |> Enum.sort |> Enum.map(&(%Item{name: &1}))
     # users = Registry.keys(Users.Registry, Process.whereis(:users)) |> Enum.sort |> Enum.map(&(%Item{name: &1}))
     iq = %IQ{type: "result", query: %Query{items: users}}
-    XmppTestParser.to_xml(iq)
+    # XmppTestParser.to_xml(iq)
+    send_responses([{state.socket, XmppTestParser.to_xml!(iq)}])
   end
 
   # def process_old(state, %Message{} = msg) do
@@ -50,15 +52,16 @@ defmodule XmppTestServer.ProcessStanzas do
   #   end
   # end
 
-  # TODO this should be changed to return a list of {socket, stanza}-tuples that
-  # are sent in the calling method
   def process(state, %Message{} = msg) do
     case Registry.select(Users.Registry, [{{:"$1", :_, :"$2"}, [{:==, :"$1", to_string(msg.to)}], [:"$2"]}]) do
       [] ->
         %Message{from: "server", body: "The user #{msg.to} is not available. Your message was not sent."} |> XmppTestParser.to_xml
       [socket] ->
-        %{msg | from: state.username} |> XmppTestParser.to_xml! |> sendMsg(socket)
-        %Message{from: "server", body: "Message sent."} |> XmppTestParser.to_xml
+        {:ok, msg1} = %Message{from: "server", body: "Message sent."} |> XmppTestParser.to_xml
+        {:ok, msg2} = %{msg | from: state.username} |> XmppTestParser.to_xml
+        send_responses([{state.socket, msg1}, {socket, msg2}])
+#        %{msg | from: state.username} |> XmppTestParser.to_xml! |> sendMsg(socket)
+#        %Message{from: "server", body: "Message sent."} |> XmppTestParser.to_xml
       _ ->
         {:error, :invalid_target}
     end
@@ -68,13 +71,13 @@ defmodule XmppTestServer.ProcessStanzas do
     {:error, :invalid_stanza}
   end
 
-  defp sendMsg(msg, socket) do
-    :gen_tcp.send(socket, msg)
-  end
+  # defp sendMsg(msg, socket) do
+  #   :gen_tcp.send(socket, msg)
+  # end
 
-  # TODO use this function
-  defp sendResponses(responses) when is_list(responses) do
-    for resp <- resp, do: :gen_tcp.send(elem(resp,0), elem(resp, 1)) |>
-      Enum.reduce(fn (a, b) -> if(a == :ok and b == :ok, do: :ok, else: :error) end)
+  defp send_responses(responses) when is_list(responses) do
+    (for resp <- responses, do: :gen_tcp.send(elem(resp,0), elem(resp, 1))) |>
+      Enum.all?(&(&1 === :ok)) |>
+      if(do: :ok, else: :error)
   end
 end

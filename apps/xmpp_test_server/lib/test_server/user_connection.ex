@@ -30,9 +30,10 @@ defmodule XmppTestServer.UserConnection do
     # username = state.username
     with {:ok, msg} <- :gen_tcp.recv(socket, 0),
          {:ok, stanza} <- XmppTestParser.parse(msg),
-         {:ok, resp} = XmppTestServer.ProcessStanzas.process(state, stanza)
+         # {:ok, resp} <- XmppTestServer.ProcessStanzas.process(state, stanza)
+         :ok <- XmppTestServer.ProcessStanzas.process(state, stanza)
     do
-      :gen_tcp.send(socket, resp)
+      # :gen_tcp.send(socket, resp)
       serve_stanzas(state)
     else
       # TODO: clearer error-returns when parsing
