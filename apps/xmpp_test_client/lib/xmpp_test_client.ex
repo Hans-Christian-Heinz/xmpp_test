@@ -5,6 +5,7 @@ defmodule XmppTestClient do
   alias XmppTestParser.Structs.Stream, as: Stream
 #  alias XmppTestParser.Structs.Query, as: Query
 #  alias XmppTestParser.Structs.Item, as: Item
+  require Logger
 
   @moduledoc ~S"""
   Documentation for XmppTestClient.
@@ -72,15 +73,24 @@ defmodule XmppTestClient do
   end
 
   defp print_response(socket) do
-    {:ok, data} = :gen_tcp.recv(socket, 0)
-    {:ok, stanza} = XmppTestParser.parse(data)
-    case print_help(stanza) do
+    with {:ok, data} <- :gen_tcp.recv(socket, 0),
+         {:ok, stanza} <- XmppTestParser.parse(data),
+         :ok <- print_help(stanza)
+    do
+      print_response(socket)
+    else
       :logout ->
+        IO.puts "Goodbye. Exiting the application."
         :gen_tcp.shutdown(socket, :read)
         # Application.stop(:xmpp_test_client)
         System.stop()
-      _ ->
+      {:error, :closed} ->
+        Logger.error "An error has occured: The connection to the server was closed."
+        System.stop(1)
+      {:error, :invalid_message} ->
+        Logger.error "An error has occured when parsing the server's message."
         print_response(socket)
+      # no fallback-clause for now.
     end
   end
 
